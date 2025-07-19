@@ -1,5 +1,15 @@
-function newPlayer(name) {
-    return {name}
+function newPlayer(playerName) {
+    let name = playerName
+
+    function updateName(newName) {
+        name = newName
+    }
+
+    function getName() {
+        return name
+    }
+
+    return {updateName, getName}
 }
 
 const gameBoard = (() => {
@@ -23,14 +33,47 @@ const gameBoard = (() => {
 
 
 const gameplay = (() => {
-    let emptySpace = 9;
+    const x = document.getElementById('xName');
+    const o = document.getElementById('oName');
     const board = gameBoard.board;
-
-    const player1 = newPlayer('a');
-    const player2 = newPlayer('b');
     
-    let player1Turn = true;
-    let currentPlayer = player1;
+    let playerX;
+    let playerO;
+    let emptySpace;
+    let xTurn;
+    let currentPlayer;
+
+    const start = document.getElementById('startGame');
+
+    start.addEventListener('click', startGame)
+
+    function startGame() {
+        if (gameDisplay.startButtonActive) {
+            emptySpace = 9;
+            gameBoard.reset();
+
+            playerX = newPlayer('X');
+            playerO = newPlayer('O');
+
+            xName = x.value.trim();
+            oName = o.value.trim();
+            if (xName) {
+                playerX.updateName(xName);
+                x.value = '';
+            }
+            if (oName) {
+                playerO.updateName(oName);
+                o.value = '';
+            }
+
+            xTurn = true;
+            currentPlayer = playerX;
+
+            gameDisplay.renderBoard();
+            gameDisplay.startButtonActive = false;
+            gameDisplay.movesActve = true;
+        }
+    }
 
     function checkRow(r, newMove) {
         return board[r].every(move => move === newMove);
@@ -61,7 +104,7 @@ const gameplay = (() => {
 
     function makeMove(r, c){
         if (!board[r][c]) {
-            let newMove = player1Turn ? 'x' : 'o'
+            let newMove = xTurn ? 'x' : 'o'
             board[r][c] = newMove;
             emptySpace--;
 
@@ -69,24 +112,70 @@ const gameplay = (() => {
                 || checkForwardDiagonal(newMove) 
                 || checkCol(c, newMove) 
                 || checkRow(r, newMove)) {
-                    console.log(`Player ${currentPlayer.name} wins`)
-                emptySpace = 9;
+                console.log(`Player ${currentPlayer.getName()} wins`)
+                gameDisplay.movesActve = false;
             } else if (emptySpace === 0) {
                 console.log(`It's a tie!`)
-                emptySpace = 9;
+                gameDisplay.movesActve = false;
             } else {
-                player1Turn = !player1Turn;
-                currentPlayer = player1Turn ? player1 : player2;
+                xTurn = !xTurn;
+                currentPlayer = xTurn ? playerX : playerO;
             }
         }
     }
     return {makeMove};
 })();
 
+const gameDisplay = (() => {
+    let startButtonActive = true;
+    let movesActve = false;
+
+    function renderBoard() {
+        const boardDisplay = document.createElement('div');
+        boardDisplay.id = 'board';
+
+        for (let r = 0; r < 3; r++) {
+            const rowDisplay = document.createElement('div');
+            for (let c = 0; c < 3; c++) {
+                const spaceDisplay = document.createElement('button');
+                
+                spaceDisplay.setAttribute('data-row', r);
+                spaceDisplay.setAttribute('data-col', c);
+
+                spaceDisplay.addEventListener('click', (e) =>{
+                    if (gameDisplay.movesActve) {
+                        const clickedSpace = e.target;
+                        r = clickedSpace.dataset.row;
+                        c = clickedSpace.dataset.col;
+                        gameplay.makeMove(r, c);
+                        clickedSpace.textContent = gameBoard.board[r][c];
+                    }
+                })
+                rowDisplay.appendChild(spaceDisplay);
+            }
+            boardDisplay.appendChild(rowDisplay);
+        }
+        const prevBoard = document.getElementById('board');
+        if (prevBoard) {prevBoard.remove()}
+
+        document.body.appendChild(boardDisplay);
+    }
+
+    return {startButtonActive, movesActve, renderBoard}
+})();
 
 
+// test();
 
-test();
+// console.log(gameBoard.board)
+
+// gameplay.makeMove(0, 0); // x
+// gameplay.makeMove(1, 0); // o
+// gameplay.makeMove(0, 1); // x
+// gameplay.makeMove(1, 1); // o
+// gameplay.makeMove(0, 2); // x -> player1 wins
+// gameDisplay.renderBoard();
+// console.log(JSON.stringify(gameBoard.board));
 
 
 function test() {
