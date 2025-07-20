@@ -114,9 +114,11 @@ const gameplay = (() => {
                 || checkRow(r, newMove)) {
                 console.log(`Player ${currentPlayer.getName()} wins`)
                 gameDisplay.movesActve = false;
+                gameDisplay.startButtonActive = true;
             } else if (emptySpace === 0) {
                 console.log(`It's a tie!`)
                 gameDisplay.movesActve = false;
+                gameDisplay.startButtonActive = true;
             } else {
                 xTurn = !xTurn;
                 currentPlayer = xTurn ? playerX : playerO;
@@ -134,10 +136,16 @@ const gameDisplay = (() => {
         const boardDisplay = document.createElement('div');
         boardDisplay.id = 'board';
 
+        const boardContainer = document.createElement('div');
+        boardContainer.classList.add('flex');
+        boardContainer.appendChild(boardDisplay);
+
         for (let r = 0; r < 3; r++) {
             const rowDisplay = document.createElement('div');
+            rowDisplay.classList.add('flex')
             for (let c = 0; c < 3; c++) {
                 const spaceDisplay = document.createElement('button');
+                spaceDisplay.classList.add('flex')
                 
                 spaceDisplay.setAttribute('data-row', r);
                 spaceDisplay.setAttribute('data-col', c);
@@ -158,7 +166,7 @@ const gameDisplay = (() => {
         const prevBoard = document.getElementById('board');
         if (prevBoard) {prevBoard.remove()}
 
-        document.body.appendChild(boardDisplay);
+        document.body.appendChild(boardContainer);
     }
 
     return {startButtonActive, movesActve, renderBoard}
