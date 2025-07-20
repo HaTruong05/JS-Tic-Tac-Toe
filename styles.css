@@ -64,17 +64,12 @@ h1 {
   transform: scale(0.98);
 }
 
-#board {
-  padding-top: 4.5rem;
-}
-
-
 #board button {
   background-color: #2A2A2A;
   border: 1px solid #3A3A3A;
   color: #F1F1F1;
   font-family: 'Montserrat', sans-serif;
-  font-size: 2.5rem;
+  font-size: 4rem;
   font-weight: 600;
   width: 120px;
   height: 120px;
@@ -84,14 +79,27 @@ h1 {
 }
 
 #board button:hover {
-  background-color: #3C3C3C;       /* Slightly lighter on hover */
+  background-color: #3C3C3C;
 }
 
 #board button:active {
-  transform: scale(0.96);          /* Click feedback */
+  transform: scale(0.96);
 }
 
 #board button:disabled {
   cursor: default;
   opacity: 0.6;
 }
+
+h3 {
+  color: #F1F1F1;
+  font-size: 2.5rem;
+  padding: 1.5rem 0;
+}
+
+svg {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+

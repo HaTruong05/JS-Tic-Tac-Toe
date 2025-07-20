@@ -22,7 +22,7 @@ const gameBoard = (() => {
     function reset() {
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 3; j++) {
-                board[i][j] = 0;
+                board[i][j] = '';
             }
         }
     }
@@ -36,6 +36,7 @@ const gameplay = (() => {
     const x = document.getElementById('xName');
     const o = document.getElementById('oName');
     const board = gameBoard.board;
+    const gameMessages = document.getElementById('gameMessages');
     
     let playerX;
     let playerO;
@@ -49,11 +50,12 @@ const gameplay = (() => {
 
     function startGame() {
         if (gameDisplay.startButtonActive) {
+            gameMessages.textContent = '';
             emptySpace = 9;
             gameBoard.reset();
 
-            playerX = newPlayer('X');
-            playerO = newPlayer('O');
+            playerX = newPlayer(1);
+            playerO = newPlayer(2);
 
             xName = x.value.trim();
             oName = o.value.trim();
@@ -68,6 +70,7 @@ const gameplay = (() => {
 
             xTurn = true;
             currentPlayer = playerX;
+            gameMessages.textContent = `Player ${currentPlayer.getName()}'s turn`;
 
             gameDisplay.renderBoard();
             gameDisplay.startButtonActive = false;
@@ -104,7 +107,7 @@ const gameplay = (() => {
 
     function makeMove(r, c){
         if (!board[r][c]) {
-            let newMove = xTurn ? 'x' : 'o'
+            let newMove = xTurn ? "X" : "O"
             board[r][c] = newMove;
             emptySpace--;
 
@@ -112,16 +115,17 @@ const gameplay = (() => {
                 || checkForwardDiagonal(newMove) 
                 || checkCol(c, newMove) 
                 || checkRow(r, newMove)) {
-                console.log(`Player ${currentPlayer.getName()} wins`)
                 gameDisplay.movesActve = false;
                 gameDisplay.startButtonActive = true;
+                gameMessages.textContent = `Player ${currentPlayer.getName()} wins!`;
             } else if (emptySpace === 0) {
-                console.log(`It's a tie!`)
                 gameDisplay.movesActve = false;
                 gameDisplay.startButtonActive = true;
+                gameMessages.textContent = `It's a tie!`
             } else {
                 xTurn = !xTurn;
                 currentPlayer = xTurn ? playerX : playerO;
+                gameMessages.textContent = `Player ${currentPlayer.getName()}'s turn`
             }
         }
     }
@@ -129,8 +133,17 @@ const gameplay = (() => {
 })();
 
 const gameDisplay = (() => {
+    const xSVG = `<svg viewBox="0 0 100 100" stroke="#F1F1F1" stroke-width="10" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
+    <line x1="20" y1="20" x2="80" y2="80"/>
+    <line x1="80" y1="20" x2="20" y2="80"/>
+    </svg>`;
+
+    const oSVG = `<svg viewBox="0 0 100 100" stroke="#F1F1F1" stroke-width="10" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="35"/>
+    </svg>`;
+
     let startButtonActive = true;
-    let movesActve = false;
+    let movesActive = false;
 
     function renderBoard() {
         const boardDisplay = document.createElement('div');
@@ -138,6 +151,7 @@ const gameDisplay = (() => {
 
         const boardContainer = document.createElement('div');
         boardContainer.classList.add('flex');
+        boardContainer.id = 'boardContainer';
         boardContainer.appendChild(boardDisplay);
 
         for (let r = 0; r < 3; r++) {
@@ -156,77 +170,19 @@ const gameDisplay = (() => {
                         r = clickedSpace.dataset.row;
                         c = clickedSpace.dataset.col;
                         gameplay.makeMove(r, c);
-                        clickedSpace.textContent = gameBoard.board[r][c];
+                        clickedSpace.innerHTML = gameBoard.board[r][c] == 'X' ? xSVG : oSVG;
                     }
                 })
                 rowDisplay.appendChild(spaceDisplay);
             }
             boardDisplay.appendChild(rowDisplay);
         }
-        const prevBoard = document.getElementById('board');
+        const prevBoard = document.getElementById('boardContainer');
         if (prevBoard) {prevBoard.remove()}
 
         document.body.appendChild(boardContainer);
     }
 
-    return {startButtonActive, movesActve, renderBoard}
+    return {startButtonActive, movesActve: movesActive, renderBoard}
 })();
-
-
-// test();
-
-// console.log(gameBoard.board)
-
-// gameplay.makeMove(0, 0); // x
-// gameplay.makeMove(1, 0); // o
-// gameplay.makeMove(0, 1); // x
-// gameplay.makeMove(1, 1); // o
-// gameplay.makeMove(0, 2); // x -> player1 wins
-// gameDisplay.renderBoard();
-// console.log(JSON.stringify(gameBoard.board));
-
-
-function test() {
-
-
-    gameBoard.reset(); // reset
-    gameplay.makeMove(0, 0); // x
-    gameplay.makeMove(1, 0); // o
-    gameplay.makeMove(0, 1); // x
-    gameplay.makeMove(1, 1); // o
-    gameplay.makeMove(0, 2); // x -> player1 wins
-
-    gameBoard.reset(); // reset
-    gameplay.makeMove(0, 0); // x
-    gameplay.makeMove(0, 1); // o
-    gameplay.makeMove(1, 0); // x
-    gameplay.makeMove(1, 1); // o
-    gameplay.makeMove(2, 0); // x -> player1 wins
-
-    gameBoard.reset(); // reset
-    gameplay.makeMove(0, 0); // x
-    gameplay.makeMove(0, 1); // o
-    gameplay.makeMove(1, 1); // x
-    gameplay.makeMove(1, 0); // o
-    gameplay.makeMove(2, 2); // x -> player1 wins
-
-    gameBoard.reset(); // reset
-    gameplay.makeMove(0, 2); // x
-    gameplay.makeMove(0, 1); // o
-    gameplay.makeMove(1, 1); // x
-    gameplay.makeMove(1, 0); // o
-    gameplay.makeMove(2, 0); // x -> player1 wins
-
-    gameBoard.reset(); // reset
-    gameplay.makeMove(0, 0); // x
-    gameplay.makeMove(0, 1); // o
-    gameplay.makeMove(0, 2); // x
-    gameplay.makeMove(1, 1); // o
-    gameplay.makeMove(1, 0); // x
-    gameplay.makeMove(2, 0); // o
-    gameplay.makeMove(1, 2); // x
-    gameplay.makeMove(2, 2); // o
-    gameplay.makeMove(2, 1); // x -> tie
-
-}
 
