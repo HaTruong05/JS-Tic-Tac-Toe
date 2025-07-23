@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./img/Tic-Tac-Toe-Board.png" alt="Tic Tac Toe Board" width="300"/>
+</p>
+
 # Tic Tac Toe Game
 
 A simple and modern web version of the classic Tic Tac Toe game, bult using plain JavaScript, HTML, and CSS.
